@@ -1,6 +1,8 @@
 services:
   laravel:
-    image: serversideup/php:8.3-fpm-nginx
+    build:
+      context: .
+      dockerfile: dockerfile
     container_name: laradev
     restart: unless-stopped
     working_dir: /var/www

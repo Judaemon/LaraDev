@@ -12,7 +12,7 @@ RUN apt-get install -y nodejs
 # RUN chown -R www-data:www-data /etc/nginx
 
 # Copy Laravel app
-COPY --chown=www-data:www-data . /var/www/html
+COPY --chown=www-data:www-data ./ /var/www/html
 
 USER www-data
 

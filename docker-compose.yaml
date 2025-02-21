@@ -6,8 +6,8 @@ services:
     container_name: laradev
     restart: unless-stopped
     working_dir: /var/www/html
-    volumes:
-      - .:/var/www/html
+    # volumes:
+    #   - ./:/var/www/html
       # - ./laravel.conf:/etc/nginx/conf.d/default.conf
     # ports:
     #   - "8080:80" # Map port 80 on the host to the container's port 80

@@ -8,6 +8,10 @@ USER root
 RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs
 
+# Ensure proper permissions for NGINX configuration
+RUN chown -R www-data:www-data /etc/nginx
+
+# Copy Laravel app
 COPY --chown=www-data:www-data . /var/www/html
 
 USER www-data

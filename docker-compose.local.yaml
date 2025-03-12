@@ -2,7 +2,7 @@ services:
   laravel:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: docker/dockerfile.local
     container_name: laradev
     restart: unless-stopped
     working_dir: /var/www/html
@@ -10,10 +10,6 @@ services:
       - ./:/var/www/html
       - /var/www/html/node_modules
       - /var/www/html/vendor
-
-      # sqlite database
-      - ./database:/var/www/html/database
-      - ./storage:/var/www/html/storage
     ports:
       - "8080:8080"
     environment:
@@ -21,6 +17,13 @@ services:
       - APP_DEBUG=true
       - APP_KEY=${APP_KEY}
       - DB_CONNECTION=sqlite
+      - LOG_CHANNEL=stack
+      - LOG_STACK=single
+      - LOG_DEPRECATIONS_CHANNEL=null
+      - LOG_LEVEL=debug
+      - BROADCAST_CONNECTION=log
+      - FILESYSTEM_DISK=local
+      - QUEUE_CONNECTION=database
 #     # Comment out if you don't have a reverse proxy setup
 #     networks: 
 #       - proxy-network

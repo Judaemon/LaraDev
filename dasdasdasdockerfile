@@ -1,0 +1,35 @@
+FROM serversideup/php:8.3-fpm-nginx
+
+# Allow passing environment argument for different setups
+ARG APP_ENV=production
+
+USER root
+
+# Install Node.js and clean up
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+USER www-data
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Only copy dependency files first to leverage caching (applies to production)
+COPY --chown=www-data:www-data package.json package-lock.json composer.json composer.lock ./
+
+# Install Node.js dependencies before full source copy
+RUN npm ci --omit=dev
+
+# Install PHP dependencies with optimized flags
+RUN composer install --no-interaction --optimize-autoloader --prefer-dist --no-dev
+
+# Copy the rest of the application source only for production
+# In development, the source code will be mounted as a volume
+COPY --chown=www-data:www-data . /var/www/html
+
+# Ensure development mode doesn't cache files (important for Laravel)
+RUN if [ "$APP_ENV" = "development" ]; then \
+    echo "Setting up development environment"; \
+    echo "opcache.enable=0" > /usr/local/etc/php/conf.d/opcache.ini; \
+    fi

@@ -1,0 +1,49 @@
+FROM serversideup/php:8.3-fpm-nginx as builder
+
+ARG APP_ENV=production
+
+USER root
+
+# Install Node.js and clean up apt cache in one layer to reduce image size
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Switch to non-root user for security
+USER www-data
+
+WORKDIR /var/www/html
+
+# Copy dependency files and install them
+COPY --chown=www-data:www-data package.json package-lock.json composer.json composer.lock ./
+RUN npm install --production && \
+    composer install --no-interaction --no-plugins --no-scripts --prefer-dist --no-dev && \
+    composer dump-autoload --optimize
+
+# Copy the rest of the application code
+COPY --chown=www-data:www-data . .
+
+# Final production image
+FROM serversideup/php:8.3-fpm-nginx
+
+ARG APP_ENV=production
+
+# Copy only necessary files from the builder stage
+COPY --from=builder --chown=www-data:www-data /var/www/html /var/www/html
+
+# Set the environment variable explicitly
+ENV APP_ENV=${APP_ENV}
+
+# Ensure the working directory is set
+WORKDIR /var/www/html
+
+# Output the environment for debugging (optional)
+RUN echo "Environment: ${APP_ENV}"
+
+# Ensure proper permissions for the storage and bootstrap/cache directories
+RUN mkdir -p storage/framework/{sessions,views,cache} && \
+    chown -R www-data:www-data storage bootstrap/cache
+
+# Start the PHP-FPM and Nginx services
+CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]

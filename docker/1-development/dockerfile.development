@@ -1,0 +1,23 @@
+FROM serversideup/php:8.3-fpm-nginx
+
+ARG APP_ENV=local
+
+USER root
+
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+USER www-data
+
+WORKDIR /var/www/html
+
+COPY --chown=www-data:www-data package.json package-lock.json composer.json composer.lock ./
+RUN npm install
+RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist
+
+RUN composer dump-autoload
+
+COPY --chown=www-data:www-data . /var/www/html
+
+RUN echo "Environment: ${APP_ENV}"

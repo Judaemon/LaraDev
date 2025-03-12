@@ -1,26 +1,29 @@
+version: '3.8'
+
 services:
   laravel:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
+      target: dev  # Change this to "prod" when building for production
+      args:
+        DEV_MODE: "true"
     container_name: laradev
     restart: unless-stopped
     working_dir: /var/www/html
-    # volumes:
-    #   - ./:/var/www/html
+    volumes:
       # - ./laravel.conf:/etc/nginx/conf.d/default.conf
+      - ./laravel.conf:/etc/nginx/conf.d/laravel.conf 
+    #   - ./:/var/www/html:cached   # Enables hot-reloading for development
+    #   - /var/www/html/node_modules  # Prevent host/node_modules conflicts
+    #   - /var/www/html/vendor        # Prevent host/vendor conflicts
     # ports:
-    #   - "8080:80" # Map port 80 on the host to the container's port 80
-    environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      - APP_KEY=${APP_KEY}
-      - DB_CONNECTION=sqlite
-    # networks: # Comment out if you don't have a reverse proxy setup
-    #   - proxy-network
-
-# # Comment out if you don't have a reverse proxy setup
-# networks:
-#   proxy-network:
-#     name: nginx_proxy-network
-#     external: true
+    #   - "8080:8080"
+    #   - "5173:5173"  # For Vite/HMR if using frontend scaffolding
+    env_file:
+      - ${ENV_FILE:-.env}  # Pass in dev.env, staging.env, or prod.env defaults to .env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -17,8 +17,8 @@ services:
     #   - ./:/var/www/html:cached   # Enables hot-reloading for development
     #   - /var/www/html/node_modules  # Prevent host/node_modules conflicts
     #   - /var/www/html/vendor        # Prevent host/vendor conflicts
-    # ports:
-    #   - "8080:8080"
+    ports:
+      - "8080"
     #   - "5173:5173"  # For Vite/HMR if using frontend scaffolding
     env_file:
       - ${ENV_FILE:-.env}  # Pass in dev.env, staging.env, or prod.env defaults to .env

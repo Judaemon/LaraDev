@@ -12,11 +12,11 @@ services:
     # ports:
     #   - "8080:80" # Map port 80 on the host to the container's port 80
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=${APP_ENV}
+      - APP_DEBUG=${APP_DEBUG}
       - APP_KEY=${APP_KEY}
-      - DB_CONNECTION=sqlite
-      - SESSION_DRIVER=file
+      - DB_CONNECTION=${DB_CONNECTION}
+      - SESSION_DRIVER=${SESSION_DRIVER}
     # networks: # Comment out if you don't have a reverse proxy setup
     #   - proxy-network
 

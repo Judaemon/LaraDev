@@ -16,6 +16,7 @@ services:
       - APP_DEBUG=true
       - APP_KEY=${APP_KEY}
       - DB_CONNECTION=sqlite
+      - SESSION_DRIVER=file
     # networks: # Comment out if you don't have a reverse proxy setup
     #   - proxy-network
 
